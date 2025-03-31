@@ -57,7 +57,7 @@ export default function HomeScreen() {
       <ScrollView style={styles.booksContainer}>
         {filteredBooks.map((book, index) => (
           <View key={index} style={styles.bookCard}>
-            <Image source={book.image || { uri: "https://via.placeholder.com/150" }} style={styles.bookImage} defaultSource={{ uri: "https://static.thenounproject.com/png/4595376-200.png" }} />
+            <Image source={book.image || { uri: "https://via.placeholder.com/150" }} style={styles.bookImage} defaultSource={{ uri: "https://via.placeholder.com/150" }} />
             <View style={styles.bookTextContainer}>
               <Text style={styles.bookTitle}>{book.title}</Text>
               <Text style={styles.bookAuthor}>{book.author}</Text>

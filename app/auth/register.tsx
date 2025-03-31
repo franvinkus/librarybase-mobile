@@ -6,6 +6,8 @@ export default function RegisterPage() {
   const Router = useRouter();
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const isLogin = false; // Menandakan bahwa halaman ini adalah Register
 
   return (
@@ -21,8 +23,9 @@ export default function RegisterPage() {
           </TouchableOpacity>
         </View>
 
-        <TextInput style={styles.input} placeholder="Username / Email" placeholderTextColor="#888" value={identifier} onChangeText={setIdentifier} />
+        <TextInput style={styles.input} placeholder="Username" placeholderTextColor="#888" value={username} onChangeText={setUsername} />
         <TextInput style={styles.input} placeholder="Password" placeholderTextColor="#888" secureTextEntry value={password} onChangeText={setPassword} />
+        <TextInput style={styles.input} placeholder="Email" placeholderTextColor="#888" secureTextEntry value={email} onChangeText={setEmail} />
         <TouchableOpacity style={styles.loginButton}>
           <Text style={styles.loginText}>REGISTER</Text>
         </TouchableOpacity>
@@ -83,7 +86,7 @@ const styles = StyleSheet.create({
   },
   activeButton: {
     backgroundColor: "#0057FF",
-    borderWidth : 0
+    borderWidth: 0,
   },
   inactiveButton: {
     backgroundColor: "#fff",
