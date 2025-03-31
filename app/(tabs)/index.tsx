@@ -40,11 +40,7 @@ export default function HomeScreen() {
         <TextInput style={styles.searchInput} placeholder="Search books..." value={searchQuery} onChangeText={setSearchQuery} clearButtonMode="while-editing" />
       </View>
 
-      {/* Categories Header */}
-      <div>
-        <Text style={styles.header}>Categories</Text>
-        <Ionicons name="filter" size={24} color="#09173E" />
-      </div>
+      <Text style={styles.header}>Categories</Text>
 
       {/* Categories Horizontal Scroll */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesScrollView} contentContainerStyle={styles.categoriesContainer}>
@@ -61,11 +57,7 @@ export default function HomeScreen() {
       <ScrollView style={styles.booksContainer}>
         {filteredBooks.map((book, index) => (
           <View key={index} style={styles.bookCard}>
-            <Image
-              source={book.image || { uri: "https://awildgeographer.files.wordpress.com/2015/02/john_muir_glacier.jpg" }}
-              style={styles.bookImage}
-              defaultSource={{ uri: "https://awildgeographer.files.wordpress.com/2015/02/john_muir_glacier.jpg" }}
-            />
+            <Image source={book.image || { uri: "https://via.placeholder.com/150" }} style={styles.bookImage} defaultSource={{ uri: "https://static.thenounproject.com/png/4595376-200.png" }} />
             <View style={styles.bookTextContainer}>
               <Text style={styles.bookTitle}>{book.title}</Text>
               <Text style={styles.bookAuthor}>{book.author}</Text>
