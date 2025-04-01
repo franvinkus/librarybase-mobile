@@ -5,11 +5,21 @@ import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";
-
 import { useColorScheme } from "@/hooks/useColorScheme";
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
+
+type RootStackParamList = {
+  Home: undefined;
+  BookDetail: { book: Book }; // Make sure the book type is defined properly
+};
+
+type Book = {
+  title: string;
+  author: string;
+  description: string;
+  image: string | null;
+};
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -24,16 +34,22 @@ export default function RootLayout() {
   }, [loaded]);
 
   if (!loaded) {
-    return null;
+    return null; // Prevent rendering until fonts are loaded
   }
 
+  const currentTheme = colorScheme === "light" ? DefaultTheme : DarkTheme;
+
   return (
-    <ThemeProvider value={colorScheme === "light" ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={currentTheme}>
+      <StatusBar style={colorScheme === "light" ? "dark" : "light"} />
+
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="register" options={{ headerShown: false }} />
+        {/* Using component properly */}
+        <Stack.Screen name="bookdetail" />
       </Stack>
     </ThemeProvider>
   );

@@ -1,13 +1,30 @@
 import React, { useState } from "react";
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import { useRouter } from "expo-router";
+
+type RootStackParamList = {
+  Home: undefined;
+  BookDetail: { book: Book };
+};
+
+type Book = {
+  title: string;
+  author: string;
+  description: string;
+  image: string | null;
+};
 
 export default function HomeScreen() {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+  const Router = useRouter();
 
   const categories: string[] = ["All", "Fantasy", "Education", "Drama"];
-  const books = [
+  const books: Book[] = [
     {
       title: "Title Book 1",
       author: "Author 1",
@@ -56,26 +73,38 @@ export default function HomeScreen() {
       {/* Books List */}
       <ScrollView style={styles.booksContainer}>
         {filteredBooks.map((book, index) => (
-          <View key={index} style={styles.bookCard}>
-            <Image source={book.image || { uri: "https://via.placeholder.com/150" }} style={styles.bookImage} defaultSource={{ uri: "https://via.placeholder.com/150" }} />
-            <View style={styles.bookTextContainer}>
-              <Text style={styles.bookTitle}>{book.title}</Text>
-              <Text style={styles.bookAuthor}>{book.author}</Text>
-              <Text style={styles.bookDescription}>{book.description}</Text>
+          <TouchableOpacity
+            key={index}
+            onPress={() =>
+              Router.push({
+                pathname: "/bookdetail",
+                params: {
+                  title: book.title,
+                  author: book.author,
+                  description: book.description,
+                  image: book.image,
+                },
+              })
+            }
+          >
+            <View style={styles.bookCard}>
+              <Image source={book.image ? { uri: book.image } : require("../../assets/images/img.png")} style={styles.bookImage} defaultSource={require("../../assets/images/img.png")} />
+              <View style={styles.bookTextContainer}>
+                <Text style={styles.bookTitle}>{book.title}</Text>
+                <Text style={styles.bookAuthor}>{book.author}</Text>
+                <Text style={styles.bookDescription}>{book.description}</Text>
+              </View>
             </View>
-          </View>
+          </TouchableOpacity>
         ))}
       </ScrollView>
     </View>
   );
 }
 
+// Styles
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    padding: 16,
-  },
+  container: { flex: 1, backgroundColor: "#fff", padding: 16 },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -85,86 +114,21 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     marginBottom: 16,
   },
-  searchIcon: {
-    marginRight: 10,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    color: "#333",
-  },
-  header: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 16,
-    color: "#09173E",
-  },
-  categoriesScrollView: {
-    maxHeight: 50,
-    marginBottom: 8,
-  },
-  categoriesContainer: {
-    alignItems: "center",
-  },
-  categoryItem: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    marginRight: 8,
-    borderRadius: 20,
-    backgroundColor: "#f0f0f0",
-  },
-  selectedCategory: {
-    backgroundColor: "#09173E",
-  },
-  categoryText: {
-    fontSize: 14,
-    color: "#000",
-  },
-  selectedCategoryText: {
-    color: "#fff",
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#e0e0e0",
-    marginVertical: 16,
-  },
-  booksContainer: {
-    flex: 1,
-  },
-  bookCard: {
-    flexDirection: "row",
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  bookImage: {
-    width: 60,
-    height: 90,
-    borderRadius: 4,
-    marginRight: 12,
-  },
-  bookTextContainer: {
-    flex: 1,
-  },
-  bookTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 4,
-  },
-  bookAuthor: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 8,
-  },
-  bookDescription: {
-    fontSize: 14,
-    color: "#333",
-    lineHeight: 20,
-  },
+  searchIcon: { marginRight: 10 },
+  searchInput: { flex: 1, fontSize: 16, color: "#333" },
+  header: { fontSize: 24, fontWeight: "bold", marginBottom: 16, color: "#09173E" },
+  categoriesScrollView: { maxHeight: 50, marginBottom: 8 },
+  categoriesContainer: { alignItems: "center" },
+  categoryItem: { paddingHorizontal: 16, paddingVertical: 8, marginRight: 8, borderRadius: 20, backgroundColor: "#f0f0f0" },
+  selectedCategory: { backgroundColor: "#09173E" },
+  categoryText: { fontSize: 14, color: "#000" },
+  selectedCategoryText: { color: "#fff" },
+  divider: { height: 1, backgroundColor: "#e0e0e0", marginVertical: 16 },
+  booksContainer: { flex: 1 },
+  bookCard: { flexDirection: "row", backgroundColor: "#fff", borderRadius: 8, padding: 16, marginBottom: 12, shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 },
+  bookImage: { width: 60, height: 90, borderRadius: 4, marginRight: 12 },
+  bookTextContainer: { flex: 1 },
+  bookTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 4 },
+  bookAuthor: { fontSize: 14, color: "#666", marginBottom: 8 },
+  bookDescription: { fontSize: 14, color: "#333", lineHeight: 20 },
 });
