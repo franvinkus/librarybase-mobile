@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
+
 export default function HomeScreen() {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState<string>("");
