@@ -1,33 +1,100 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import axios from "axios";
+import { useRouter } from "expo-router";
+
 
 
 export default function HomeScreen() {
+  const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [loading, setLoading] = useState(true);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const categories: string[] = ["All", "Fantasy", "Education", "Drama"];
-  const books = [
+
+  const [selectedBook, setSelectedBook] = useState<{
+    bookId: number;
+    title: string;
+    author: string;
+    description: string;
+    imageUrl: string;
+  } | null>(null);
+
+  const [books, setBooks] = useState<
     {
-      title: "Title Book 1",
-      author: "Author 1",
-      description: "Descriptions for book 1",
-      image: null,
-    },
-    {
-      title: "Title Book 2",
-      author: "Author 2",
-      description: "Descriptions for book 2",
-      image: null,
-    },
-    {
-      title: "Title Book 3",
-      author: "Author 3",
-      description: "Descriptions for book 3",
-      image: null,
-    },
-  ];
+      bookId: number;
+      title: string;
+      author: string;
+      categoryIds: number[];
+      categoryNames: string[];
+      description: string;
+      createdAt: string;
+      updatedAt: string;
+      imageUrl: string;
+    }[]
+  >([]);
+
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://localhost:7055";
+        const token = localStorage.getItem("authToken");
+        const userName = localStorage.getItem("userName");
+
+        if (!token) {
+          throw new Error("User session expired! Please login again.");
+          router.push("/auth/login");
+        }
+
+        const response = await axios.get(`${API_BASE_URL}/api/Books/Get-Books`, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const today = new Date().toISOString().split("T")[0]; // Format: YYYY-MM-DD
+
+        // Filter hanya buku yang `availabilityDate` kosong atau sama dengan tanggal hari ini
+        const filteredBooks = response.data.filter((book: any) => !book.availabilityDate || book.availabilityDate.split("T")[0] === today);
+
+        // Acak daftar buku dan ambil hanya 5 buku
+        const shuffledBooks = [...filteredBooks]
+          .sort(() => Math.random() - 0.5) // Acak urutan
+          .slice(0, 5); // Ambil 5 data pertama
+
+        setBooks(shuffledBooks);
+      } catch (err) {
+        console.error("Error fetching books:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBooks();
+  }, []);
+
+  // const filteredBooks = selectedCategory === "ALL" ? books : books.filter((book) => book.categoryNames.includes(selectedCategory));
+
+  const handleBookClick = (book: typeof selectedBook) => {
+    setSelectedBook(book);
+    setIsPopupOpen(true);
+  };
+
+  const openPopup = (book: any) => {
+    setSelectedBook({
+      bookId: book.bookId,
+      title: book.title,
+      author: book.author,
+      description: book.description,
+      imageUrl: book.imageUrl || "",
+    });
+    setIsPopupOpen(true);
+  };
 
   const filteredBooks = books.filter(
     (book) => book.title.toLowerCase().includes(searchQuery.toLowerCase()) || book.author.toLowerCase().includes(searchQuery.toLowerCase()) || book.description.toLowerCase().includes(searchQuery.toLowerCase())
@@ -58,7 +125,7 @@ export default function HomeScreen() {
       <ScrollView style={styles.booksContainer}>
         {filteredBooks.map((book, index) => (
           <View key={index} style={styles.bookCard}>
-            <Image source={book.image || { uri: "https://via.placeholder.com/150" }} style={styles.bookImage} defaultSource={{ uri: "https://via.placeholder.com/150" }} />
+            <Image source={{uri: book.imageUrl || "https://via.placeholder.com/150" }} style={styles.bookImage} defaultSource={{ uri: "https://via.placeholder.com/150" }} />
             <View style={styles.bookTextContainer}>
               <Text style={styles.bookTitle}>{book.title}</Text>
               <Text style={styles.bookAuthor}>{book.author}</Text>
