@@ -12,18 +12,22 @@ import { BookText, UsersRound } from "lucide-react-native";
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
+  // Pilih warna berdasarkan tema (dark/light mode)
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            position: "absolute",
-          },
-          default: {},
-        }),
+
+        tabBarStyle: {
+          backgroundColor: "white", // Ubah background tab bar menjadi putih
+          borderTopWidth: 0, // Opsional: hilangkan garis atas
+          position: Platform.OS === "ios" ? "absolute" : "relative",
+          elevation: 5, // Efek bayangan untuk Android
+          shadowOpacity: 0.1, // Efek bayangan untuk iOS
+        },
       }}
     >
       <Tabs.Screen
