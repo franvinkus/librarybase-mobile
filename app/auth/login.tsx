@@ -46,7 +46,13 @@ export default function LoginPage() {
         await AsyncStorage.setItem("userName", userName);
         await AsyncStorage.setItem("userRole", msg.includes("Admin") ? "Admin" : "User");
 
-        console.log("User Role:", localStorage.getItem("userRole"));
+        const role = await AsyncStorage.getItem("userRole");
+        console.log("User Role:", role);
+
+        console.log("Login function triggered");
+        console.log("Request body:", requestBody);
+        console.log("API response:", response.data);
+
 
         // In the handleLogin function:
         if (msg.includes("Admin")) {
