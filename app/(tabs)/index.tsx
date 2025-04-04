@@ -5,8 +5,6 @@ import axios from "axios";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-
-
 export default function HomeScreen() {
   const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
@@ -97,9 +95,7 @@ export default function HomeScreen() {
   const filteredBooks = books.filter(
     (book) =>
       (selectedCategory === "All" || book.categoryNames.includes(selectedCategory)) &&
-      (book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        book.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        book.description.toLowerCase().includes(searchQuery.toLowerCase()))
+      (book.title.toLowerCase().includes(searchQuery.toLowerCase()) || book.author.toLowerCase().includes(searchQuery.toLowerCase()) || book.description.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   return (
@@ -124,20 +120,22 @@ export default function HomeScreen() {
       <View style={styles.divider} />
 
       {/* Books List */}
-      {loading? (
+      {loading ? (
         <ActivityIndicator size="large" color="#09173E" style={{ marginTop: 20 }} />
-      ) : (<ScrollView style={styles.booksContainer}>
-        {filteredBooks.map((book, index) => (
-          <View key={index} style={styles.bookCard}>
-            <Image source={{uri: book.imageUrl || "https://via.placeholder.com/150" }} style={styles.bookImage} defaultSource={{ uri: "https://via.placeholder.com/150" }} />
-            <View style={styles.bookTextContainer}>
-              <Text style={styles.bookTitle}>{book.title}</Text>
-              <Text style={styles.bookAuthor}>{book.author}</Text>
-              <Text style={styles.bookDescription}>{book.description}</Text>
+      ) : (
+        <ScrollView style={styles.booksContainer}>
+          {filteredBooks.map((book, index) => (
+            <View key={index} style={styles.bookCard}>
+              <Image source={{ uri: book.imageUrl || "https://via.placeholder.com/150" }} style={styles.bookImage} defaultSource={{ uri: "https://via.placeholder.com/150" }} />
+              <View style={styles.bookTextContainer}>
+                <Text style={styles.bookTitle}>{book.title}</Text>
+                <Text style={styles.bookAuthor}>{book.author}</Text>
+                <Text style={styles.bookDescription}>{book.description}</Text>
+              </View>
             </View>
-          </View>
-        ))}
-      </ScrollView>)}
+          ))}
+        </ScrollView>
+      )}
     </View>
   );
 }
@@ -160,15 +158,13 @@ const styles = StyleSheet.create({
   searchIcon: {
     marginRight: 10,
   },
-<<<<<<< HEAD
-  searchInput: { flex: 1, fontSize: 16, color: "#333" },
-=======
+
   searchInput: {
     flex: 1,
     fontSize: 16,
     color: "#333",
   },
->>>>>>> 8d636d0c2b84203169f494a562a74a7acdb3fb67
+
   header: {
     fontSize: 24,
     fontWeight: "bold",
