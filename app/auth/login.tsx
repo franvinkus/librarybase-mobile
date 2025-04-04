@@ -24,8 +24,8 @@ export default function LoginPage() {
       const isEmail = identifier.includes("@");
       const requestBody = isEmail ? { email: identifier, password } : { userName: identifier, password };
 
-      console.log("Sebelum kirim request:", requestBody);
-      console.log("API_BASE_URL:", API_BASE_URL);
+      // console.log("Sebelum kirim request:", requestBody);
+      // console.log("API_BASE_URL:", API_BASE_URL);
 
       const response = await axios.post(`${API_BASE_URL}/api/LibraryBase/Auth/LogIn`, requestBody, {
         headers: {
@@ -33,7 +33,7 @@ export default function LoginPage() {
           Accept: "application/json",
         },
       });
-      console.log("Setelah menerima response:", response.data);
+      // console.log("Setelah menerima response:", response.data);
 
       if (response.data) {
         const { token, data } = response.data;
@@ -49,7 +49,7 @@ export default function LoginPage() {
         await AsyncStorage.setItem("userName", userName);
         await AsyncStorage.setItem("userRole", msg.includes("Admin") ? "Admin" : "User");
         
-        console.log("this is the URL",API_BASE_URL);
+        // console.log("this is the URL",API_BASE_URL);
         console.log("User Role:", msg);
         Router.push("/(tabs)");
       }
@@ -65,9 +65,9 @@ export default function LoginPage() {
     return;
   };
 
-  const handleTest = () => {
-      console.log("Testing works");
-  }
+  // const handleTest = () => {
+  //     console.log("Testing works");
+  // }
 
   return (
     <View style={styles.container}>
@@ -84,16 +84,16 @@ export default function LoginPage() {
 
         <TextInput style={styles.input} placeholder="Username / Email" placeholderTextColor="#888" value={identifier} onChangeText={setIdentifier} />
         <TextInput style={styles.input} placeholder="Password" placeholderTextColor="#888" secureTextEntry value={password} onChangeText={setPassword} />
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginText} >
+        <TouchableOpacity style={styles.loginButton}>
+          <Text style={styles.loginText} onPress={handleLogin}>
             LOGIN
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleTest}>
+        {/* <TouchableOpacity onPress={handleTest}>
           <Text>
             Testing
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <Text style={styles.registerText}>
           Not a Member?{" "}
           <Text style={styles.registerNow} onPress={() => Router.push("/auth/register")}>
