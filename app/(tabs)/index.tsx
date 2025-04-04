@@ -126,7 +126,7 @@ export default function HomeScreen() {
         <ScrollView style={styles.booksContainer}>
           {filteredBooks.map((book, index) => (
             <View key={index} style={styles.bookCard}>
-              <Image source={{ uri: book.imageUrl || "https://via.placeholder.com/150" }} style={styles.bookImage} defaultSource={{ uri: "https://via.placeholder.com/150" }} />
+              <Image source={{ uri: book.imageUrl }} style={styles.bookImage} defaultSource={{ uri: "https://via.placeholder.com/150" }} />
               <View style={styles.bookTextContainer}>
                 <Text style={styles.bookTitle}>{book.title}</Text>
                 <Text style={styles.bookAuthor}>{book.author}</Text>

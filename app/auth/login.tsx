@@ -19,10 +19,7 @@ export default function LoginPage() {
 
   const handleLogin = async () => {
     try {
-      // Cek apakah input adalah email (mengandung "@")
       const isEmail = identifier.includes("@");
-
-      // Bentuk request body sesuai input
       const requestBody = isEmail ? { email: identifier, password } : { userName: identifier, password };
 
       const response = await axios.post(`${API_BASE_URL}/api/LibraryBase/Auth/LogIn`, requestBody, {
@@ -37,7 +34,7 @@ export default function LoginPage() {
         const { userId, userName, msg } = data;
 
         if (!token) {
-          setError("⚠️ Token tidak ditemukan dalam response.");
+          Alert.alert("⚠️ Token Error", "Token tidak ditemukan dalam response.");
           return;
         }
 
@@ -46,42 +43,13 @@ export default function LoginPage() {
         await AsyncStorage.setItem("userName", userName);
         await AsyncStorage.setItem("userRole", msg.includes("Admin") ? "Admin" : "User");
 
-        const role = await AsyncStorage.getItem("userRole");
-        console.log("User Role:", role);
-
-        console.log("Login function triggered");
-        console.log("Request body:", requestBody);
-        console.log("API response:", response.data);
-
-
-        // In the handleLogin function:
-        if (msg.includes("Admin")) {
-          Alert.alert("LogIn Success", "You have been LogIn as Admin successfully.", [
-            {
-              text: "OK",
-              onPress: () => {
-                Router.push("/(tabs)");
-              },
-            },
-          ]);
-        } else {
-          Alert.alert("LogIn Success", "You have been LogIn as Customer successfully.", [
-            {
-              text: "OK",
-              onPress: () => {
-                Router.push("/(tabs)");
-              },
-            },
-          ]);
-        }
-      } else {
-        setError("⚠ Response dari server kosong.");
+        console.log("User Role:", msg);
+        Router.push("/(tabs)");
       }
     } catch (err) {
+      let errorMsg = "⚠ Terjadi kesalahan yang tidak terduga.";
       if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || "❌ Login gagal, silakan coba lagi.");
-      } else {
-        setError("⚠ Terjadi kesalahan yang tidak terduga.");
+        errorMsg = err.response?.data?.message || "❌ Login gagal, silakan coba lagi.";
       }
     }
   };
@@ -101,7 +69,7 @@ export default function LoginPage() {
 
         <TextInput style={styles.input} placeholder="Username / Email" placeholderTextColor="#888" value={identifier} onChangeText={setIdentifier} />
         <TextInput style={styles.input} placeholder="Password" placeholderTextColor="#888" secureTextEntry value={password} onChangeText={setPassword} />
-        <TouchableOpacity style={styles.loginButton} onPress={() => Router.push("/(tabs)")}>
+        <TouchableOpacity style={styles.loginButton}>
           <Text style={styles.loginText} onPress={handleLogin}>
             LOGIN
           </Text>
