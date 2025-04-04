@@ -15,12 +15,17 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://localhost:7055";
+  // const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://localhost:7055";
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://192.168.0.107:7055";
 
   const handleLogin = async () => {
+    console.log("LOGIN DITEKAN");
     try {
       const isEmail = identifier.includes("@");
       const requestBody = isEmail ? { email: identifier, password } : { userName: identifier, password };
+
+      console.log("Sebelum kirim request:", requestBody);
+      console.log("API_BASE_URL:", API_BASE_URL);
 
       const response = await axios.post(`${API_BASE_URL}/api/LibraryBase/Auth/LogIn`, requestBody, {
         headers: {
@@ -28,6 +33,7 @@ export default function LoginPage() {
           Accept: "application/json",
         },
       });
+      console.log("Setelah menerima response:", response.data);
 
       if (response.data) {
         const { token, data } = response.data;
@@ -39,20 +45,29 @@ export default function LoginPage() {
         }
 
         await AsyncStorage.setItem("authToken", token);
-        await AsyncStorage.setItem("userId", userId);
+        await AsyncStorage.setItem("userId", userId.toString());
         await AsyncStorage.setItem("userName", userName);
         await AsyncStorage.setItem("userRole", msg.includes("Admin") ? "Admin" : "User");
-
+        
+        console.log("this is the URL",API_BASE_URL);
         console.log("User Role:", msg);
         Router.push("/(tabs)");
       }
     } catch (err) {
+      console.log("Masuk catch dengan error:", err);
       let errorMsg = "⚠ Terjadi kesalahan yang tidak terduga.";
       if (axios.isAxiosError(err)) {
         errorMsg = err.response?.data?.message || "❌ Login gagal, silakan coba lagi.";
+        Alert.alert("Login Error", errorMsg);
       }
     }
+   
+    return;
   };
+
+  const handleTest = () => {
+      console.log("Testing works");
+  }
 
   return (
     <View style={styles.container}>
@@ -69,9 +84,14 @@ export default function LoginPage() {
 
         <TextInput style={styles.input} placeholder="Username / Email" placeholderTextColor="#888" value={identifier} onChangeText={setIdentifier} />
         <TextInput style={styles.input} placeholder="Password" placeholderTextColor="#888" secureTextEntry value={password} onChangeText={setPassword} />
-        <TouchableOpacity style={styles.loginButton}>
-          <Text style={styles.loginText} onPress={handleLogin}>
+        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+          <Text style={styles.loginText} >
             LOGIN
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleTest}>
+          <Text>
+            Testing
           </Text>
         </TouchableOpacity>
         <Text style={styles.registerText}>
@@ -157,6 +177,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     marginTop: 10,
+    borderColor: 'black',
   },
   loginText: {
     color: "#fff",
