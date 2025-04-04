@@ -48,7 +48,7 @@ export default function LoginPage() {
         await AsyncStorage.setItem("userId", userId.toString());
         await AsyncStorage.setItem("userName", userName);
         await AsyncStorage.setItem("userRole", msg.includes("Admin") ? "Admin" : "User");
-        
+
         // console.log("this is the URL",API_BASE_URL);
         console.log("User Role:", msg);
         Router.push("/(tabs)");
@@ -61,7 +61,7 @@ export default function LoginPage() {
         Alert.alert("Login Error", errorMsg);
       }
     }
-   
+
     return;
   };
 
@@ -85,9 +85,7 @@ export default function LoginPage() {
         <TextInput style={styles.input} placeholder="Username / Email" placeholderTextColor="#888" value={identifier} onChangeText={setIdentifier} />
         <TextInput style={styles.input} placeholder="Password" placeholderTextColor="#888" secureTextEntry value={password} onChangeText={setPassword} />
         <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginText} >
-            LOGIN
-          </Text>
+          <Text style={styles.loginText}>LOGIN</Text>
         </TouchableOpacity>
         {/* <TouchableOpacity onPress={handleTest}>
           <Text>
@@ -177,7 +175,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     marginTop: 10,
-    borderColor: 'black',
+    borderColor: "black",
   },
   loginText: {
     color: "#fff",
