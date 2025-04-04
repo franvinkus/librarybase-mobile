@@ -2,11 +2,83 @@ import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useRouter } from "expo-router";
+import axios from "axios";
+import { Alert } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function LoginPage() {
+  const navigation = useNavigation();
   const Router = useRouter();
   const [identifier, setIdentifier] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
+
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://localhost:7055";
+
+  const handleLogin = async () => {
+    try {
+      // Cek apakah input adalah email (mengandung "@")
+      const isEmail = identifier.includes("@");
+
+      // Bentuk request body sesuai input
+      const requestBody = isEmail ? { email: identifier, password } : { userName: identifier, password };
+
+      const response = await axios.post(`${API_BASE_URL}/api/LibraryBase/Auth/LogIn`, requestBody, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
+
+      if (response.data) {
+        const { token, data } = response.data;
+        const { userId, userName, msg } = data;
+
+        if (!token) {
+          setError("⚠️ Token tidak ditemukan dalam response.");
+          return;
+        }
+
+        await AsyncStorage.setItem("authToken", token);
+        await AsyncStorage.setItem("userId", userId);
+        await AsyncStorage.setItem("userName", userName);
+        await AsyncStorage.setItem("userRole", msg.includes("Admin") ? "Admin" : "User");
+
+        console.log("User Role:", localStorage.getItem("userRole"));
+
+        // In the handleLogin function:
+        if (msg.includes("Admin")) {
+          Alert.alert("LogIn Success", "You have been LogIn as Admin successfully.", [
+            {
+              text: "OK",
+              onPress: () => {
+                Router.push("/(tabs)");
+              },
+            },
+          ]);
+        } else {
+          Alert.alert("LogIn Success", "You have been LogIn as Customer successfully.", [
+            {
+              text: "OK",
+              onPress: () => {
+                Router.push("/(tabs)");
+              },
+            },
+          ]);
+        }
+      } else {
+        setError("⚠ Response dari server kosong.");
+      }
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || "❌ Login gagal, silakan coba lagi.");
+      } else {
+        setError("⚠ Terjadi kesalahan yang tidak terduga.");
+      }
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -24,7 +96,9 @@ export default function LoginPage() {
         <TextInput style={styles.input} placeholder="Username / Email" placeholderTextColor="#888" value={identifier} onChangeText={setIdentifier} />
         <TextInput style={styles.input} placeholder="Password" placeholderTextColor="#888" secureTextEntry value={password} onChangeText={setPassword} />
         <TouchableOpacity style={styles.loginButton} onPress={() => Router.push("/(tabs)")}>
-          <Text style={styles.loginText}>LOGIN</Text>
+          <Text style={styles.loginText} onPress={handleLogin}>
+            LOGIN
+          </Text>
         </TouchableOpacity>
         <Text style={styles.registerText}>
           Not a Member?{" "}

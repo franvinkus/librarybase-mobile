@@ -1,21 +1,72 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
+import axios from "axios";
+import { Alert } from "react-native";
+import { runOnUI } from "react-native-reanimated";
+import { useEffect } from "react";
 
 export default function RegisterPage() {
-  const Router = useRouter();
+  const router = useRouter();
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
   const isLogin = false; // Menandakan bahwa halaman ini adalah Register
+
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://localhost:7055";
+
+  const handleRegister = async () => {
+    // try {
+    //   const response = await axios.post(`${API_BASE_URL}/api/LibraryBase/Auth/SignUp/Customer`, {
+    //     userName: username,
+    //     password,
+    //     email,
+    //   });
+
+    try {
+      const response = await axios.post("https://localhost:7055/api/LibraryBase/Auth/SignUp/Customer", {
+        userName: username,
+        password,
+        email,
+      });
+
+      runOnUI(() => {
+        Alert.alert("Register Success", "You have been registered successfully.", [
+          {
+            text: "OK",
+            onPress: () => {
+              console.log("User pressed OK");
+              router.push("/auth/login");
+            },
+          },
+        ]);
+      })();
+
+      console.log(response.data);
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        if (err.response && err.response.data && err.response.data.errors) {
+          // Ambil semua error dari response API
+          const errorMessages = Object.values(err.response.data.errors).flat().join("\n"); // Gabungkan pesan dengan newline
+          setError(errorMessages);
+          console.log("Error Messages:", errorMessages);
+        } else {
+          setError(err.response?.data?.message || "Email sudah terdaftar / Username sudah digunakan");
+        }
+      } else {
+        setError("An unexpected error occurred");
+      }
+    }
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Register</Text>
       <View style={styles.card}>
         <View style={styles.toggleContainer}>
-          <TouchableOpacity style={[styles.toggleButton, !isLogin ? styles.inactiveButton : styles.activeButton]} onPress={() => Router.push("/auth/login")}>
+          <TouchableOpacity style={[styles.toggleButton, !isLogin ? styles.inactiveButton : styles.activeButton]} onPress={() => router.push("/auth/login")}>
             <Text style={!isLogin ? styles.inactiveText : styles.activeText}>Login</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.toggleButton, isLogin ? styles.inactiveButton : styles.activeButton]}>
@@ -25,13 +76,14 @@ export default function RegisterPage() {
 
         <TextInput style={styles.input} placeholder="Username" placeholderTextColor="#888" value={username} onChangeText={setUsername} />
         <TextInput style={styles.input} placeholder="Password" placeholderTextColor="#888" secureTextEntry value={password} onChangeText={setPassword} />
-        <TextInput style={styles.input} placeholder="Email" placeholderTextColor="#888" secureTextEntry value={email} onChangeText={setEmail} />
-        <TouchableOpacity style={styles.loginButton}>
+        <TextInput style={styles.input} placeholder="Email" placeholderTextColor="#888" value={email} onChangeText={setEmail} />
+        <TouchableOpacity style={styles.loginButton} onPress={handleRegister}>
           <Text style={styles.loginText}>REGISTER</Text>
         </TouchableOpacity>
+        {/* {error !== "" && <Text style={{ color: "red", marginTop: 10 }}>{error}</Text>} */}
         <Text style={styles.registerText}>
           Have an account?{" "}
-          <Text style={styles.registerNow} onPress={() => Router.push("/auth/login")}>
+          <Text style={styles.registerNow} onPress={() => router.push("/auth/login")}>
             Log In Now
           </Text>
         </Text>
