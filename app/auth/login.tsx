@@ -84,8 +84,8 @@ export default function LoginPage() {
 
         <TextInput style={styles.input} placeholder="Username / Email" placeholderTextColor="#888" value={identifier} onChangeText={setIdentifier} />
         <TextInput style={styles.input} placeholder="Password" placeholderTextColor="#888" secureTextEntry value={password} onChangeText={setPassword} />
-        <TouchableOpacity style={styles.loginButton}>
-          <Text style={styles.loginText} onPress={handleLogin}>
+        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+          <Text style={styles.loginText} >
             LOGIN
           </Text>
         </TouchableOpacity>
