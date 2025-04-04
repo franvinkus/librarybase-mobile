@@ -42,11 +42,6 @@ export default function HomeScreen() {
         const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://localhost:7055";
         const token = await AsyncStorage.getItem("authToken");
 
-        if (!token) {
-          router.push("/auth/login");
-          return;
-        }
-
         const response = await axios.get(`${API_BASE_URL}/api/Books/Get-Books`, {
           headers: {
             "Content-Type": "application/json",

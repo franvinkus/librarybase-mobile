@@ -32,17 +32,7 @@ export default function RegisterPage() {
         email,
       });
 
-      runOnUI(() => {
-        Alert.alert("Register Success", "You have been registered successfully.", [
-          {
-            text: "OK",
-            onPress: () => {
-              console.log("User pressed OK");
-              router.push("/auth/login");
-            },
-          },
-        ]);
-      })();
+      router.push("/auth/login");
 
       console.log(response.data);
     } catch (err) {

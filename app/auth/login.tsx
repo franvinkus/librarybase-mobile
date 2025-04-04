@@ -50,6 +50,7 @@ export default function LoginPage() {
       let errorMsg = "⚠ Terjadi kesalahan yang tidak terduga.";
       if (axios.isAxiosError(err)) {
         errorMsg = err.response?.data?.message || "❌ Login gagal, silakan coba lagi.";
+        Alert.alert("Login Error", errorMsg);
       }
     }
   };
