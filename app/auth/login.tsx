@@ -53,28 +53,14 @@ export default function LoginPage() {
           Alert.alert(
             "LogIn Success",
             "You have been LogIn as Admin successfully.",
-            [
-              {
-                text: "OK",
-                onPress: () => {
-                  Router.push("/(tabs)");
-                },
-              },
-            ]
           );
+            Router.push("/(tabs)");
         } else {
           Alert.alert(
             "LogIn Success",
             "You have been LogIn as Customer successfully.",
-            [
-              {
-                text: "OK",
-                onPress: () => {
-                  Router.push("/(tabs)");
-                },
-              },
-            ]
           );
+            Router.push("/(tabs)");
         }
       } else {
         setError("⚠ Response dari server kosong.");
@@ -106,8 +92,8 @@ export default function LoginPage() {
 
         <TextInput style={styles.input} placeholder="Username / Email" placeholderTextColor="#888" value={identifier} onChangeText={setIdentifier} />
         <TextInput style={styles.input} placeholder="Password" placeholderTextColor="#888" secureTextEntry value={password} onChangeText={setPassword} />
-        <TouchableOpacity style={styles.loginButton} onPress={() => Router.push("/(tabs)")}>
-          <Text style={styles.loginText} onPress={handleLogin}>LOGIN</Text>
+        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+          <Text style={styles.loginText} >LOGIN</Text>
         </TouchableOpacity>
         <Text style={styles.registerText}>
           Not a Member?{" "}
