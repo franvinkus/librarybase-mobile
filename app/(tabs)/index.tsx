@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput, Image } from "react-native";
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput, Image, ActivityIndicator } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 
@@ -41,12 +42,11 @@ export default function HomeScreen() {
     const fetchBooks = async () => {
       try {
         const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://localhost:7055";
-        const token = localStorage.getItem("authToken");
-        const userName = localStorage.getItem("userName");
+        const token = await AsyncStorage.getItem("authToken");
 
         if (!token) {
-          throw new Error("User session expired! Please login again.");
           router.push("/auth/login");
+          return;
         }
 
         const response = await axios.get(`${API_BASE_URL}/api/Books/Get-Books`, {
@@ -78,8 +78,6 @@ export default function HomeScreen() {
     fetchBooks();
   }, []);
 
-  // const filteredBooks = selectedCategory === "ALL" ? books : books.filter((book) => book.categoryNames.includes(selectedCategory));
-
   const handleBookClick = (book: typeof selectedBook) => {
     setSelectedBook(book);
     setIsPopupOpen(true);
@@ -97,7 +95,11 @@ export default function HomeScreen() {
   };
 
   const filteredBooks = books.filter(
-    (book) => book.title.toLowerCase().includes(searchQuery.toLowerCase()) || book.author.toLowerCase().includes(searchQuery.toLowerCase()) || book.description.toLowerCase().includes(searchQuery.toLowerCase())
+    (book) =>
+      (selectedCategory === "All" || book.categoryNames.includes(selectedCategory)) &&
+      (book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        book.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        book.description.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   return (
@@ -122,7 +124,9 @@ export default function HomeScreen() {
       <View style={styles.divider} />
 
       {/* Books List */}
-      <ScrollView style={styles.booksContainer}>
+      {loading? (
+        <ActivityIndicator size="large" color="#09173E" style={{ marginTop: 20 }} />
+      ) : (<ScrollView style={styles.booksContainer}>
         {filteredBooks.map((book, index) => (
           <View key={index} style={styles.bookCard}>
             <Image source={{uri: book.imageUrl || "https://via.placeholder.com/150" }} style={styles.bookImage} defaultSource={{ uri: "https://via.placeholder.com/150" }} />
@@ -133,7 +137,7 @@ export default function HomeScreen() {
             </View>
           </View>
         ))}
-      </ScrollView>
+      </ScrollView>)}
     </View>
   );
 }

@@ -4,6 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import axios from "axios";
 import {Alert} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function LoginPage() {
   const navigation = useNavigation();
@@ -40,10 +41,10 @@ export default function LoginPage() {
           return;
         }
 
-        localStorage.setItem("authToken", token);
-        localStorage.setItem("userId", userId);
-        localStorage.setItem("userName", userName);
-        localStorage.setItem("userRole", msg.includes("Admin") ? "Admin" : "User");
+        await AsyncStorage.setItem("authToken", token);
+        await AsyncStorage.setItem("userId", userId);
+        await AsyncStorage.setItem("userName", userName);
+        await AsyncStorage.setItem("userRole", msg.includes("Admin") ? "Admin" : "User");
 
         console.log("User Role:", localStorage.getItem("userRole"));
 
