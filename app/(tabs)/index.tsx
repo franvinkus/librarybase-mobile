@@ -6,9 +6,6 @@ import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import BookPopup from "../Component/BookPopUp"; // sesuaikan path-nya
 
-
-
-
 export default function HomeScreen() {
   const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
@@ -25,25 +22,25 @@ export default function HomeScreen() {
     description: string;
     imageUrl: string;
   } | null>(null);
-  
+
   const [books, setBooks] = useState<
-  {
-    bookId: number;
-    title: string;
-    author: string;
-    categoryIds: number[];
-    categoryNames: string[];
-    description: string;
-    createdAt: string;
-    updatedAt: string;
-    imageUrl: string;
-  }[]
+    {
+      bookId: number;
+      title: string;
+      author: string;
+      categoryIds: number[];
+      categoryNames: string[];
+      description: string;
+      createdAt: string;
+      updatedAt: string;
+      imageUrl: string;
+    }[]
   >([]);
-  
+
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://192.168.0.107:7055";
+        const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://192.168.18.36:7055";
         const token = await AsyncStorage.getItem("authToken");
 
         const response = await axios.get(`${API_BASE_URL}/api/Books/Get-Books`, {
@@ -57,7 +54,7 @@ export default function HomeScreen() {
         const today = new Date().toISOString().split("T")[0]; // Format: YYYY-MM-DD
 
         // Filter hanya buku yang `availabilityDate` kosong atau sama dengan tanggal hari ini
-        
+
         const filteredBooks = response.data.filter((book: any) => {
           console.log("Checking book:", book.title, "→ availabilityDate:", book.availabilityDate);
           return !book.availabilityDate || book.availabilityDate.split("T")[0] === today;
@@ -97,21 +94,14 @@ export default function HomeScreen() {
     });
     setIsPopupOpen(true);
   };
-  
 
   const filteredBooks = books.filter((book) => {
-      const matchesCategory = selectedCategory === "All" || 
-      book.categoryNames.some((name) => name.toLowerCase() === selectedCategory.toLowerCase()
-      );
-      
-      const matchesSearch = 
-      book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      book.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      book.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === "All" || book.categoryNames.some((name) => name.toLowerCase() === selectedCategory.toLowerCase());
 
-      return matchesCategory && matchesSearch;
+    const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase()) || book.author.toLowerCase().includes(searchQuery.toLowerCase()) || book.description.toLowerCase().includes(searchQuery.toLowerCase());
+
+    return matchesCategory && matchesSearch;
   });
-
 
   return (
     <View style={styles.container}>
@@ -134,8 +124,6 @@ export default function HomeScreen() {
 
       <View style={styles.divider} />
 
-      
-
       {/* Books List */}
       {loading ? (
         <ActivityIndicator size="large" color="#09173E" style={{ marginTop: 20 }} />
@@ -145,7 +133,7 @@ export default function HomeScreen() {
             <View key={index} style={styles.bookCard}>
               <TouchableOpacity onPress={() => handleBookClick(book)}>
                 <Image source={{ uri: book.imageUrl }} style={styles.bookImage} defaultSource={{ uri: "https://via.placeholder.com/150" }} />
-                <View style={styles.bookTextContainer} >
+                <View style={styles.bookTextContainer}>
                   <Text style={styles.bookTitle}>{book.title}</Text>
                   <Text style={styles.bookAuthor}>{book.author}</Text>
                   <Text style={styles.bookDescription}>{book.description}</Text>
@@ -159,8 +147,8 @@ export default function HomeScreen() {
       {isPopupOpen && selectedBook && (
         <View style={styles.popupOverlay}>
           <View style={styles.popupContainer}>
-            <View style = {styles.imageWrapper}>
-              <Image source={{ uri: selectedBook.imageUrl || "https://via.placeholder.com/150" }} style={styles.popupImage}/>
+            <View style={styles.imageWrapper}>
+              <Image source={{ uri: selectedBook.imageUrl || "https://via.placeholder.com/150" }} style={styles.popupImage} />
             </View>
             <Text style={styles.popupTitle}>{selectedBook.title}</Text>
             <Text style={styles.popupAuthor}>{selectedBook.author}</Text>
@@ -299,7 +287,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     zIndex: 1000,
   },
-  
+
   popupContainer: {
     backgroundColor: "#fff",
     padding: 20,
@@ -311,34 +299,34 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 5,
   },
-  
+
   popupTitle: {
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 10,
     textAlign: "center",
   },
-  
+
   popupAuthor: {
     fontSize: 16,
     color: "#666",
     marginBottom: 10,
     textAlign: "center",
   },
-  
+
   popupDescription: {
     fontSize: 14,
     color: "#333",
     textAlign: "center",
     marginBottom: 20,
   },
-  
+
   closeButton: {
     backgroundColor: "#09173E",
     paddingVertical: 10,
     borderRadius: 8,
   },
-  
+
   closeButtonText: {
     color: "#fff",
     textAlign: "center",
@@ -349,11 +337,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 16,
   },
-  
+
   popupImage: {
     width: 120,
     height: 180,
     borderRadius: 8,
   },
-  
 });
