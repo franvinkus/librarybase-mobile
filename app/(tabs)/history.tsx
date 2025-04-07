@@ -1,7 +1,11 @@
-import React from "react";
-import { View, Text, Image, FlatList, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Icon from "react-native-vector-icons/Ionicons";
+import React, { useState, useEffect } from "react";
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput, Image, ActivityIndicator, Alert, FlatList  } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import axios from "axios";
+import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Data dummy
 const books = [
@@ -33,7 +37,82 @@ const books = [
 
 // Komponen utama
 export default function HistoryScreen() {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const Router = useRouter();
   const navigation = useNavigation();
+
+  type Book = {
+    bookId: string;
+    title: string;
+    author: string;
+    description: string;
+    imageUrl: string;
+    status: string;
+  };
+
+  type BorrowedBook = {
+    bookId: string;
+    borrowDate: string;
+    status: string;
+  };
+
+  const [books, setBooks] = useState<Book[]>([]);
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const [borrowedBooks, setBorrowedBooks] = useState<BorrowedBook[]>([]);
+
+  useEffect(() => {
+    if (!localStorage.getItem("authToken")) {
+      Router.push("/auth/login");
+    }
+
+    const fetchBooks = async () => {
+      try {
+        const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://192.168.0.107:7055";
+        const token = localStorage.getItem("authToken");
+
+        if (!token) throw new Error("User session expired! Please login again.");
+
+        // Fetch all books
+        const booksResponse = await axios.get(`${API_BASE_URL}/api/Books/Get-Books`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setBooks(booksResponse.data);
+
+        // Fetch borrowed books
+        const borrowedResponse = await axios.get(`${API_BASE_URL}/api/Borrow/See-All-Borrow`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        console.log(booksResponse.data)
+        setBorrowedBooks(borrowedResponse.data);
+      } catch (err) {
+        console.error("Error fetching books:", err);
+        setError("Failed to load books. Please try again later.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBooks();
+  }, []);
+
+  const getBookDetailsFromCache = (bookId: string): Book | null => {
+    return books.find((book) => book.bookId === bookId) || null;
+  };
+
+  const borrowedBooksWithDetails = borrowedBooks
+    .filter((borrowedBook) => borrowedBook.status === "returned") // Filter out returned books
+    .map((borrowedBook) => {
+      const bookDetails = getBookDetailsFromCache(borrowedBook.bookId);
+      return {
+        ...borrowedBook,
+        title: bookDetails?.title || "Unknown Title",
+        author: bookDetails?.author || "Unknown Author",
+        description: bookDetails?.description || "No description available",
+        imageUrl: bookDetails?.imageUrl || "",
+      };
+    });
+
 
   // Warna status peminjaman
   const getStatusColor = (status: string): string => {
@@ -60,10 +139,10 @@ export default function HistoryScreen() {
       {/* List Buku */}
       <FlatList
         data={books}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.bookId}
         renderItem={({ item }) => (
           <View style={styles.card}>
-            <Image source={item.image} style={styles.bookImage} />
+            <Image source={{uri: item.imageUrl}} style={styles.bookImage} />
             <View style={styles.bookInfo}>
               <Text style={styles.title}>{item.title}</Text>
               <Text style={styles.author}>Author: {item.author}</Text>
