@@ -1,36 +1,69 @@
-import React from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, useRoute } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useRouter } from "expo-router";
 
 export default function ProfileScreen() {
+  const Router = useRouter();
+
+  const [userName, setUserName] = useState("");
+
+  // Load userName from AsyncStorage saat komponen pertama kali dimount
+  useEffect(() => {
+    const fetchUserName = async () => {
+      const storedName = await AsyncStorage.getItem("userName");
+      if (storedName) {
+        setUserName(storedName);
+      }
+    };
+    fetchUserName();
+  }, []);
+
+  // await AsyncStorage.setItem("authToken", token);
+  // await AsyncStorage.setItem("userId", userId.toString());
+  // await AsyncStorage.setItem("userName", userName);
+  // await AsyncStorage.setItem("userRole", msg.includes("Admin") ? "Admin" : "User");
+
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.clear(); // this clears all key-value pairs
+      console.log("Storage cleared!");
+      Router.push("/auth/login");
+    } catch (e) {
+      console.error("Failed to clear AsyncStorage:", e);
+    }
+  };
   return (
     <View style={styles.container}>
       {/* Header dengan Avatar dan Nama */}
       <View style={styles.header}>
-        <Image
-          source={require("../../assets/images/profile.png")} // Pastikan file ada di /assets
-          style={styles.avatar}
-        />
-        <Text style={styles.name}>Budi Siregar</Text>
+        <Image source={require("../../assets/images/profile.png")} style={styles.avatar} />
+        <Text style={styles.name}>{userName}</Text>
       </View>
 
       {/* Informasi Username */}
       <View style={styles.infoContainer}>
         <Ionicons name="mail-outline" size={24} color="black" />
         <View style={styles.textContainer}>
-          <Text style={styles.label}>Username</Text>
-          <Text style={styles.email}>Budi123@gmail.com</Text>
+          <Text style={styles.label}>Email </Text>
+          <Text style={styles.email}></Text>
         </View>
       </View>
+
+      {/* Spacer untuk mendorong tombol logout ke bawah */}
+      <View style={{ flex: 1 }} />
+
+      {/* Tombol Logout */}
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Text style={styles.logoutText}>Logout</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
-// Konfigurasi Bottom Tabs
-
-// ** Styles **
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -72,6 +105,18 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
   },
   email: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  logoutButton: {
+    backgroundColor: "#E63946",
+    margin: 20,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  logoutText: {
+    color: "white",
     fontSize: 16,
     fontWeight: "bold",
   },

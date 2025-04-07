@@ -16,7 +16,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
 
   // const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://localhost:7055";
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://192.168.0.107:7055";
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://192.168.1.24:7055";
 
   const handleLogin = async () => {
     console.log("LOGIN DITEKAN");
