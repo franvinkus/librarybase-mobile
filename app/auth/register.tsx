@@ -15,7 +15,7 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const isLogin = false; // Menandakan bahwa halaman ini adalah Register
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://localhost:7055";
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://192.168.18.36:7055";
 
   const handleRegister = async () => {
     // try {
@@ -26,7 +26,7 @@ export default function RegisterPage() {
     //   });
 
     try {
-      const response = await axios.post("https://localhost:7055/api/LibraryBase/Auth/SignUp/Customer", {
+      const response = await axios.post("https://192.168.18.36:7055/api/LibraryBase/Auth/SignUp/Customer", {
         userName: username,
         password,
         email,

@@ -8,6 +8,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 type BookPopupProps = {
   isOpen: boolean;
   onClose: () => void;
+  onBorrowSuccess: () => void;
   book: {
     bookId: number;
     title: string;
@@ -18,7 +19,7 @@ type BookPopupProps = {
   handlerBorrow?: () => void;
 };
 
-export default function BookPopup({ isOpen, onClose, book }: BookPopupProps) {
+export default function BookPopup({ isOpen, onClose, book, onBorrowSuccess }: BookPopupProps) {
   if (!isOpen || !book) return null;
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -56,16 +57,10 @@ export default function BookPopup({ isOpen, onClose, book }: BookPopupProps) {
       );
 
       if (response.status === 200) {
-        Alert.alert("Good job!", "Request Borrow Book Succeeded", [
-          {
-            text: "OK",
-            onPress: () => {
-              onClose();
-              handleBorrow?.();
-              router.push("/(tabs)/profile"); 
-            },
-          },
-        ]);
+        console.log("Borrow request sent successfully:", response.data);
+        Alert.alert("Success", "Borrow request sent successfully.");
+        onClose();
+        onBorrowSuccess();
       }
     } catch (err: any) {
       console.error("Error:", err.response);

@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput, Image, ActivityIndicator, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import axios from "axios";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import BookPopup from "../Component/BookPopUp"; // sesuaikan path-nya
+import BookPopup from "../Component/BookPopUp";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -37,47 +38,47 @@ export default function HomeScreen() {
     }[]
   >([]);
 
+  const fetchBooks = async () => {
+    try {
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://192.168.18.36:7055";
+      const token = await AsyncStorage.getItem("authToken");
+
+      const response = await axios.get(`${API_BASE_URL}/api/Books/Get-Books`, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const today = new Date().toISOString().split("T")[0]; // Format: YYYY-MM-DD
+
+      const filteredBooks = response.data.filter((book: any) => {
+        console.log("Checking book:", book.title, "→ availabilityDate:", book.availabilityDate);
+        return !book.availabilityDate || book.availabilityDate.split("T")[0] === today;
+      });
+
+      const shuffledBooks = [...filteredBooks].sort(() => Math.random() - 0.5).slice(0, 5);
+
+      setBooks(shuffledBooks);
+      console.log("Final books to show after all filters:", shuffledBooks);
+    } catch (err) {
+      console.error("Error fetching books:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchBooks = async () => {
-      try {
-        const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://192.168.18.36:7055";
-        const token = await AsyncStorage.getItem("authToken");
-
-        const response = await axios.get(`${API_BASE_URL}/api/Books/Get-Books`, {
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        const today = new Date().toISOString().split("T")[0]; // Format: YYYY-MM-DD
-
-        // Filter hanya buku yang `availabilityDate` kosong atau sama dengan tanggal hari ini
-
-        const filteredBooks = response.data.filter((book: any) => {
-          console.log("Checking book:", book.title, "→ availabilityDate:", book.availabilityDate);
-          return !book.availabilityDate || book.availabilityDate.split("T")[0] === today;
-        });
-
-        console.log("Filtered books:", filteredBooks);
-
-        // Acak daftar buku dan ambil hanya 5 buku
-        const shuffledBooks = [...filteredBooks]
-          .sort(() => Math.random() - 0.5) // Acak urutan
-          .slice(0, 5); // Ambil 5 data pertama
-
-        setBooks(shuffledBooks);
-        console.log("Final books to show after all filters:", filteredBooks);
-      } catch (err) {
-        console.error("Error fetching books:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchBooks();
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      setLoading(true);
+      fetchBooks();
+    }, [])
+  );
 
   const handleBookClick = (book: typeof selectedBook) => {
     setSelectedBook(book);
@@ -168,6 +169,7 @@ export default function HomeScreen() {
         isOpen={isPopupOpen}
         onClose={() => setIsPopupOpen(false)}
         book={selectedBook}
+        onBorrowSuccess={fetchBooks}
         handlerBorrow={() => {
           Alert.alert("Borrow request sent!", `${selectedBook?.title}`);
         }}

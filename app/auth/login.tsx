@@ -60,7 +60,6 @@ export default function LoginPage() {
         Alert.alert("Login Error", errorMsg);
       }
     }
-
     return;
   };
 
