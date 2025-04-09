@@ -31,7 +31,7 @@ export default function BookPopup({ isOpen, onClose, book, onBorrowSuccess }: Bo
       setLoading(true);
       setError("");
 
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://192.168.18.36:7055";
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://192.168.0.107:7055";
       const token = await AsyncStorage.getItem("authToken");
 
       if (!token) {

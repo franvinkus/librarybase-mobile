@@ -34,14 +34,14 @@ export default function HistoryScreen() {
   const [borrowedBooks, setBorrowedBooks] = useState<BorrowedBook[]>([]);
 
   useEffect(() => {
-    if (!localStorage.getItem("authToken")) {
+    if (!AsyncStorage.getItem("authToken")) {
       Router.push("/auth/login");
     }
 
     const fetchBooks = async () => {
       try {
-        const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://192.168.18.36:7055";
-        const token = localStorage.getItem("authToken");
+        const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://192.168.0.107:7055";
+        const token = await AsyncStorage.getItem("authToken");
 
         if (!token) throw new Error("User session expired! Please login again.");
 
@@ -103,11 +103,11 @@ export default function HistoryScreen() {
   // Warna status peminjaman
   const getStatusColor = (status: string): string => {
     switch (status) {
-      case "Returned":
+      case "returned":
         return "green";
-      case "Borrowed":
+      case "borrowed":
         return "orange";
-      case "Pending":
+      case "pending":
         return "red";
       default:
         return "black";
