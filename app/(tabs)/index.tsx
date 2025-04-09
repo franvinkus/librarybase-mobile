@@ -9,7 +9,7 @@ import { useFocusEffect } from "@react-navigation/native";
 
 export default function HomeScreen() {
   const router = useRouter();
-  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [selectedCategory, setSelectedCategory] = useState("ALL");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -93,7 +93,7 @@ export default function HomeScreen() {
   };
 
   const filteredBooks = books.filter((book) => {
-    const matchesCategory = selectedCategory === "All" || book.categoryNames.some((name) => name.toLowerCase() === selectedCategory.toLowerCase());
+    const matchesCategory = selectedCategory === "ALL" || book.categoryNames.some((name) => name.toLowerCase() === selectedCategory.toLowerCase());
 
     const matchesSearch = book.title.toLowerCase().includes(searchQuery.toLowerCase()) || book.author.toLowerCase().includes(searchQuery.toLowerCase()) || book.description.toLowerCase().includes(searchQuery.toLowerCase());
 
