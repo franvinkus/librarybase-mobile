@@ -103,11 +103,11 @@ export default function HistoryScreen() {
   // Warna status peminjaman
   const getStatusColor = (status: string): string => {
     switch (status) {
-      case "Returned":
+      case "returned":
         return "green";
-      case "Borrowed":
+      case "borrowed":
         return "orange";
-      case "Pending":
+      case "pending":
         return "red";
       default:
         return "black";
