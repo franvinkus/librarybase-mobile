@@ -14,8 +14,6 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
-  const categories: string[] = ["All", "Fantasy", "Education", "Drama", "Romance", "Mystery", "Biography", "Fiction", "Action"];
-
   const [selectedBook, setSelectedBook] = useState<{
     bookId: number;
     title: string;
@@ -69,6 +67,8 @@ export default function HomeScreen() {
     fetchBooks();
   }, []);
 
+  const uniqueCategories = ["ALL", ...new Set(books.flatMap((b: any) => b.categoryNames))];
+
   useFocusEffect(
     useCallback(() => {
       setLoading(true);
@@ -112,7 +112,7 @@ export default function HomeScreen() {
 
       {/* Categories Horizontal Scroll */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesScrollView} contentContainerStyle={styles.categoriesContainer}>
-        {categories.map((category) => (
+        {uniqueCategories.map((category) => (
           <TouchableOpacity key={category} style={[styles.categoryItem, selectedCategory === category && styles.selectedCategory]} onPress={() => setSelectedCategory(category)}>
             <Text style={[styles.categoryText, selectedCategory === category && styles.selectedCategoryText]}>{category}</Text>
           </TouchableOpacity>
