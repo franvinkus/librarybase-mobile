@@ -40,7 +40,7 @@ export default function HomeScreen() {
 
   const fetchBooks = async () => {
     try {
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://192.168.0.107:7055";
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://192.168.18.36:7055";
       const token = await AsyncStorage.getItem("authToken");
 
       const response = await axios.get(`${API_BASE_URL}/api/Books/Get-Books`, {
@@ -53,15 +53,11 @@ export default function HomeScreen() {
 
       const today = new Date().toISOString().split("T")[0]; // Format: YYYY-MM-DD
 
-      const filteredBooks = response.data.filter((book: any) => {
-        console.log("Checking book:", book.title, "→ availabilityDate:", book.availabilityDate);
-        return !book.availabilityDate || book.availabilityDate.split("T")[0] === today;
-      });
+      // Filter hanya buku yang `availabilityDate` kosong atau sama dengan tanggal hari ini
+      const filteredBooks = response.data.filter((book: any) => book.availibility === "True" || !book.availabilityDate || book.availabilityDate.split("T")[0] === today);
 
-      const shuffledBooks = [...filteredBooks].sort(() => Math.random() - 0.5).slice(0, 5);
-
-      setBooks(shuffledBooks);
-      console.log("Final books to show after all filters:", shuffledBooks);
+      setBooks(filteredBooks);
+      console.log("Final books to show after all filters:", filteredBooks);
     } catch (err) {
       console.error("Error fetching books:", err);
     } finally {

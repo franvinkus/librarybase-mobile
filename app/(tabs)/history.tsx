@@ -40,7 +40,7 @@ export default function HistoryScreen() {
 
     const fetchBooks = async () => {
       try {
-        const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://192.168.0.107:7055";
+        const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://192.168.18.36:7055";
         const token = await AsyncStorage.getItem("authToken");
 
         if (!token) throw new Error("User session expired! Please login again.");
@@ -61,28 +61,21 @@ export default function HistoryScreen() {
         const borrows = borrowedResponse.data;
 
         // Opsional: Gabungkan data buku + status pinjam
-        const merged = books
-          .filter((book: any) => borrows.some((borrow: any) => borrow.bookId === book.bookId)) // hanya buku yang dipinjam
-          .map((book: any) => {
-            const relatedBorrow = borrows.find((borrow: any) => borrow.bookId === book.bookId);
+        const merged = borrows
+          .map((borrow: any) => {
+            const book = books.find((b: any) => b.bookId === borrow.bookId);
 
-            let status;
-
-            if (relatedBorrow) {
-              if (relatedBorrow.status.toLowerCase() === "pending") {
-                status = "pending";
-              } else if (relatedBorrow.status.toLowerCase() === "borrowed") {
-                status = "borrowed";
-              } else if (relatedBorrow.status.toLowerCase() === "returned") {
-                status = "returned";
-              }
-            }
+            if (!book) return null; // skip kalau data buku nggak ditemukan
 
             return {
               ...book,
-              status,
+              status: borrow.status.toLowerCase(), // ambil status dari borrow langsung
+              borrowDate: borrow.borrowDate,
+              returnDate: borrow.returnDate,
+              borrowId: borrow.borrowId,
             };
-          });
+          })
+          .filter(Boolean); // hilangkan null
 
         setBooks(merged);
       } catch (err) {
@@ -125,7 +118,7 @@ export default function HistoryScreen() {
       {/* List Buku */}
       <FlatList
         data={books}
-        keyExtractor={(item) => item.bookId}
+        keyExtractor={(item, index) => `${item.bookId}-${index}`}
         renderItem={({ item }) => (
           <View style={styles.card}>
             <Image source={{ uri: item.imageUrl }} style={styles.bookImage} />
