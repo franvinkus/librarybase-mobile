@@ -127,9 +127,9 @@ export default function HomeScreen() {
       ) : (
         <ScrollView style={styles.booksContainer}>
           {filteredBooks.map((book, index) => (
-            <View key={index} style={styles.bookCard}>
-              <TouchableOpacity onPress={() => handleBookClick(book)}>
-                <Image source={{ uri: book.imageUrl }} style={styles.bookImage} defaultSource={{ uri: "https://via.placeholder.com/150" }} />
+            <View key={index}>
+              <TouchableOpacity style={styles.bookCard} onPress={() => handleBookClick(book)}>
+                <Image source={{ uri: book.imageUrl || "https://via.placeholder.com/150" }} style={styles.bookImage} />
                 <View style={styles.bookTextContainer}>
                   <Text style={styles.bookTitle}>{book.title}</Text>
                   <Text style={styles.bookAuthor}>{book.author}</Text>
@@ -238,22 +238,23 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   bookCard: {
-    flexDirection: "row",
     backgroundColor: "#fff",
-    borderRadius: 8,
-    padding: 16,
+    borderRadius: 10,
+    padding: 12,
+    flexDirection: "row",
+    alignItems: "flex-start",
     marginBottom: 12,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 2,
   },
   bookImage: {
-    width: 60,
-    height: 90,
-    borderRadius: 4,
-    marginRight: 12,
+    width: 80,
+    height: 120,
+    borderRadius: 5,
+    marginRight: 10,
   },
   bookTextContainer: {
     flex: 1,
@@ -261,17 +262,16 @@ const styles = StyleSheet.create({
   bookTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 4,
   },
   bookAuthor: {
     fontSize: 14,
     color: "#666",
-    marginBottom: 8,
+    marginBottom: 5,
   },
   bookDescription: {
     fontSize: 14,
-    color: "#333",
-    lineHeight: 20,
+    color: "#444",
+    marginBottom: 8,
   },
 
   popupOverlay: {
